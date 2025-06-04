@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Store Assignment Report</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: #f7f7f7;
+      color: #333;
+    }
+    h2, h3 {
+      text-align: center;
+    }
+    form {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 0.6rem;
+      margin-top: 0.4rem;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+    button {
+      margin-top: 1.5rem;
+      background-color: #0070f3;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #005bb5;
+    }
+    .thank-you {
+      text-align: center;
+      padding: 2rem;
+      font-size: 1.2rem;
+      color: green;
+      display: none;
+    }
+    .instructions {
+      background-color: #fff;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+    }
+    ul {
+      padding-left: 1.5rem;
+    }
+  </style>
+  <!-- Uploadcare Widget script -->
+  <script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js" charset="utf-8"></script>
+</head>
+<body oncontextmenu="return false;"> <!-- Disable right-click -->
+
+  <h2>Store Assignment Report</h2>
+
+  <div class="instructions">
+    <h3>📝 Assignment Instructions</h3>
+    <p>You're assigned to visit the store listed below as a regular customer. Your goal is to evaluate the overall customer experience, product availability, and cleanliness of the store.</p>
+    <p><strong>During Your Visit:</strong></p>
+    <ul>
+      <li>Observe store cleanliness (entrance, aisles, shelves, restrooms).</li>
+      <li>Check how well-stocked common sections are (groceries, toiletries, etc.).</li>
+      <li>Engage with at least one staff member. Note their friendliness and helpfulness.</li>
+      <li>Proceed to checkout and evaluate the speed, courtesy, and professionalism.</li>
+      <li>Purchase 2–3 low-cost items (see suggested list below). Keep your receipt.</li>
+    </ul>
+    <p><strong>Suggested Items (choose any):</strong></p>
+    <ul>
+      <li>A loaf of bread or canned food</li>
+      <li>Water, soda, or snack (e.g., gum, chips)</li>
+      <li>Toothpaste, soap, or other personal care item</li>
+      <li>Paper towels, dish soap, or other basic household item</li>
+      <li>Optional: Clearance item or small gift card</li>
+    </ul>
+    <p><strong>After Your Visit:</strong></p>
+    <ul>
+      <li>Fill out the report form below in detail.</li>
+      <li>Include observations about cleanliness, staff, product availability, and checkout experience.</li>
+      <li>Attach or reference your receipt if needed.</li>
+    </ul>
+    <p><strong>Note:</strong> Do not reveal that you are evaluating the store. Act naturally as a regular shopper.</p>
+  </div>
+
+  <form id="report-form">
+    <label for="employee_name">Employee Name</label>
+    <input type="text" id="employee_name" name="employee_name" required />
+
+    <label for="store_location">Store Location</label>
+    <input type="text" id="store_location" name="store_location" required />
+
+    <label for="visit_date">Visit Date</label>
+    <input type="date" id="visit_date" name="visit_date" required />
+
+    <label for="report_details">Report Details</label>
+    <textarea id="report_details" name="report_details" placeholder="Describe your experience, who you interacted with, how clean the store was, item availability, checkout process, etc." required></textarea>
+
+    <label for="receipt_upload">Upload Receipt</label>
+    <!-- Uploadcare widget input -->
+    <input
+      type="hidden"
+      role="uploadcare-uploader"
+      name="receipt_upload"
+      data-public-key="YOUR_UPLOADCARE_PUBLIC_KEY"
+      data-clearable="true"
+      data-images-only="true"
+      data-tabs="file url"
+      required
+    />
+
+    <button type="submit">Submit Report</button>
+  </form>
+
+  <div class="thank-you" id="thank-you-message">
+    Thank you for submitting your report! Please close this page when done.
+  </div>
+
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    (function(){
+      emailjs.init("YOUR_EMAILJS_USER_ID"); // Replace with your EmailJS user ID
+    })();
+
+    const form = document.getElementById('report-form');
+    const thankYouMessage = document.getElementById('thank-you-message');
+
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      // Get the Uploadcare widget value (file URL)
+      const uploadcareWidget = uploadcare.Widget('[role=uploadcare-uploader]');
+      const fileUrl = uploadcareWidget.value ? uploadcareWidget.value.cdnUrl : '';
+
+      if (!fileUrl) {
+        alert('Please upload your receipt before submitting.');
+        return;
+      }
+
+      // Append the receipt URL as a hidden input so EmailJS can send it
+      let hiddenInput = form.querySelector('input[name="receipt_url"]');
+      if (!hiddenInput) {
+        hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'receipt_url';
+        form.appendChild(hiddenInput);
+      }
+      hiddenInput.value = fileUrl;
+
+      emailjs.sendForm('YOUR_EMAILJS_SERVICE_ID', 'YOUR_EMAILJS_TEMPLATE_ID', this)
+        .then(() => {
+          form.style.display = 'none';
+          thankYouMessage.style.display = 'block';
+        }, (error) => {
+          alert('Failed to send report. Please try again.');
+          console.error('EmailJS error:', error);
+        });
+    });
+
+    // Optional: further protect against F12 (DevTools)
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+        e.preventDefault();
+      }
+    });
+  </script>
+</body>
+</html>

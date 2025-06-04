@@ -124,7 +124,7 @@
       type="hidden"
       role="uploadcare-uploader"
       name="receipt_upload"
-      data-public-key="YOUR_UPLOADCARE_PUBLIC_KEY"
+      data-public-key="dc6750519d7c0a4947bc"
       data-clearable="true"
       data-images-only="true"
       data-tabs="file url"
@@ -142,7 +142,7 @@
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
   <script>
     (function(){
-      emailjs.init("YOUR_EMAILJS_USER_ID"); // Replace with your EmailJS user ID
+      emailjs.init("ehWZaWVGGwFetPJ8n"); // Replace with your EmailJS user ID
     })();
 
     const form = document.getElementById('report-form');
@@ -170,7 +170,7 @@
       }
       hiddenInput.value = fileUrl;
 
-      emailjs.sendForm('YOUR_EMAILJS_SERVICE_ID', 'YOUR_EMAILJS_TEMPLATE_ID', this)
+      emailjs.sendForm('service_bcm1omc', 'template_vptlxjl', this)
         .then(() => {
           form.style.display = 'none';
           thankYouMessage.style.display = 'block';

@@ -70,7 +70,11 @@
       padding-left: 1.5rem;
     }
   </style>
-  <!-- Uploadcare Widget script -->
+
+  <!-- Uploadcare Widget Script (with Public Key) -->
+  <script>
+    UPLOADCARE_PUBLIC_KEY = "dc6750519d7c0a4947bc";
+  </script>
   <script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js" charset="utf-8"></script>
 </head>
 <body oncontextmenu="return false;"> <!-- Disable right-click -->
@@ -86,21 +90,13 @@
       <li>Check how well-stocked common sections are (groceries, toiletries, etc.).</li>
       <li>Engage with at least one staff member. Note their friendliness and helpfulness.</li>
       <li>Proceed to checkout and evaluate the speed, courtesy, and professionalism.</li>
-      <li>Purchase 2–3 low-cost items (see suggested list below). Keep your receipt.</li>
-    </ul>
-    <p><strong>Suggested Items (choose any):</strong></p>
-    <ul>
-      <li>A loaf of bread or canned food</li>
-      <li>Water, soda, or snack (e.g., gum, chips)</li>
-      <li>Toothpaste, soap, or other personal care item</li>
-      <li>Paper towels, dish soap, or other basic household item</li>
-      <li>Clearance item or small gift card</li>
+      <li>Purchase 2–3 low-cost items. Keep your receipt.</li>
     </ul>
     <p><strong>After Your Visit:</strong></p>
     <ul>
       <li>Fill out the report form below in detail.</li>
       <li>Include observations about cleanliness, staff, product availability, and checkout experience.</li>
-      <li>Attach or reference your receipt if needed.</li>
+      <li><strong>Upload your receipt.</strong></li>
     </ul>
     <p><strong>Note:</strong> Do not reveal that you are evaluating the store. Act naturally as a regular shopper.</p>
   </div>
@@ -119,12 +115,11 @@
     <textarea id="report_details" name="report_details" placeholder="Describe your experience, who you interacted with, how clean the store was, item availability, checkout process, etc." required></textarea>
 
     <label for="receipt_upload">Upload Receipt</label>
-    <!-- Uploadcare widget input -->
     <input
       type="hidden"
       role="uploadcare-uploader"
       name="receipt_upload"
-      data-public-key="dc6750519d7c0a4947bc"
+      id="receipt_upload"
       data-clearable="true"
       data-images-only="true"
       data-tabs="file url"
@@ -151,16 +146,15 @@
     form.addEventListener('submit', function(event) {
       event.preventDefault();
 
-      // Get the Uploadcare widget value (file URL)
-      const uploadcareWidget = uploadcare.Widget('[role=uploadcare-uploader]');
-      const fileUrl = uploadcareWidget.value ? uploadcareWidget.value.cdnUrl : '';
+      const receiptInput = document.getElementById('receipt_upload');
+      const fileUrl = receiptInput.value;
 
-      if (!fileUrl) {
+      if (!fileUrl || fileUrl.trim() === '') {
         alert('Please upload your receipt before submitting.');
         return;
       }
 
-      // Append the receipt URL as a hidden input so EmailJS can send it
+      // Append the receipt URL to the form data
       let hiddenInput = form.querySelector('input[name="receipt_url"]');
       if (!hiddenInput) {
         hiddenInput = document.createElement('input');
@@ -180,7 +174,7 @@
         });
     });
 
-    // Optional: further protect against F12 (DevTools)
+    // Block F12 and Ctrl+Shift+I
     document.addEventListener('keydown', function(e) {
       if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
         e.preventDefault();
